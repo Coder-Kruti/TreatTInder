@@ -3,7 +3,7 @@ CREATE TABLE Dogs (
     id INT PRIMARY KEY,
     dog_id LONG;
     name VARCHAR(255),
-    url VARCHAR(500),
+    url VARCHAR(1000),
     age VARCHAR(50),
     gender VARCHAR(10),
     size VARCHAR(20),
