@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class PetFinder {
     private final Logger logger = LoggerFactory.getLogger(PetFinder.class);
-    private static final String GET_DOGS = Constants.PET_FINDER_BASE_URL + "v2/animals?type=dog&page=2";
+    private static final String GET_DOGS = Constants.PET_FINDER_BASE_URL + "v2/animals?type=dog&page=3";
 
     private String getAuthToken() {
         StringBuilder response = new StringBuilder();

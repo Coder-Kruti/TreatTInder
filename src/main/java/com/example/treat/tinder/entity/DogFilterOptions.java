@@ -12,6 +12,6 @@ import lombok.Setter;
 public class DogFilterOptions {
     private String organizationName;
     private String gender;
-    private String breed;
-    private String location;
+    private Breed breed;
+    private Contact contact;
 }

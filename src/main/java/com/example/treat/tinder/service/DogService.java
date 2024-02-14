@@ -14,6 +14,8 @@ import com.example.treat.tinder.entity.PetFinderResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -39,9 +41,27 @@ public class DogService {
     }
 
     public List<Dog> filterDogs(DogFilterOptions filterOptions) {
-        // Implement the logic to filter dogs based on the provided options
-//        return dogRepository.findDogsByFilterOptions(filterOptions.getOrganizationName(),filterOptions.getGender(),filterOptions.getBreed(),filterOptions.getLocation());
-        return null;
+        HashSet<Dog> uniqueDogs = new HashSet<>();
+        List<Dog> dogList = new ArrayList<>();
+        if (filterOptions.getGender() != null) {
+            List<Dog> genderFiltered = dogRepository.findByGender(filterOptions.getGender());
+            dogList.addAll(genderFiltered);
+        }
+        if (filterOptions.getBreed() != null) {
+            List<Dog> breedFiltered = dogRepository.findByBreed( filterOptions.getBreed().getPrimary() , filterOptions.getBreed().getSecondary(),
+                    filterOptions.getBreed().isMixed(), filterOptions.getBreed().isUnknown());
+
+            dogList.addAll(breedFiltered);
+        }
+        return dogList;
+
+
+//        return dogRepository.filterDogs(filterOptions.getOrganizationName(), filterOptions.getGender(),
+//                filterOptions.getBreed().getPrimary() , filterOptions.getBreed().getSecondary(),
+//                filterOptions.getBreed().isMixed(), filterOptions.getBreed().isUnknown(),
+//                filterOptions.getContact().getAddress().getCity(), filterOptions.getContact().getAddress().getState(),
+//                filterOptions.getContact().getAddress().getPostcode(), filterOptions.getContact().getAddress().getCountry());
+
     }
 
     public void getDogsPetFinder() {
@@ -103,7 +123,6 @@ public class DogService {
         organisation.setAddress1(animal.getContact().getAddress().getAddress1());
         organisation.setAddress2(animal.getContact().getAddress().getAddress2());
         organisationRepository.save(organisation);
-
     }
 
 }
