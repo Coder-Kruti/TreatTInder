@@ -26,6 +26,12 @@ public class DogController implements DogResource {
         return new ResponseEntity<>(dogList, HttpStatus.OK);
     }
 
+//    @Override
+//    public ResponseEntity<Dog> saveLikeDislike() {
+//        List<Dog> dogList = dogService.filterDogs(filterOptions);
+//        return new ResponseEntity<>(dogList, HttpStatus.OK);
+//    }
+
     @Override
     public void getDogsFromPetFinder() {
         dogService.getDogsPetFinder();
