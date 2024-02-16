@@ -16,12 +16,13 @@ public class DogController implements DogResource {
     @Autowired
     DogService dogService;
 
-    DogController(DogService dogService){
+    DogController(DogService dogService) {
         this.dogService = dogService;
     }
+
     @Override
     public ResponseEntity<List<Dog>> getDogs(DogFilterOptions filterOptions) {
-        List<Dog> dogList = dogService.filterDogs(filterOptions );
+        List<Dog> dogList = dogService.filterDogs(filterOptions);
         return new ResponseEntity<>(dogList, HttpStatus.OK);
     }
 

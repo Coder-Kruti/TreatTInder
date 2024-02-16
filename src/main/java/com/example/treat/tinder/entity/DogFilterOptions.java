@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DogFilterOptions {
     private String organizationName;
-    private String gender;
+    private Gender gender;
     private Breed breed;
     private Contact contact;
 }

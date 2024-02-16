@@ -9,6 +9,7 @@ import com.example.treat.tinder.entity.Animal;
 import com.example.treat.tinder.entity.Breed;
 import com.example.treat.tinder.entity.Dog;
 import com.example.treat.tinder.entity.DogFilterOptions;
+import com.example.treat.tinder.entity.Gender;
 import com.example.treat.tinder.entity.Organisation;
 import com.example.treat.tinder.entity.PetFinderResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,27 +41,45 @@ public class DogService {
         this.customerRepository = customerRepository;
     }
 
-    public List<Dog> filterDogs(DogFilterOptions filterOptions) {
-        HashSet<Dog> uniqueDogs = new HashSet<>();
-        List<Dog> dogList = new ArrayList<>();
-        if (filterOptions.getGender() != null) {
-            List<Dog> genderFiltered = dogRepository.findByGender(filterOptions.getGender());
-            dogList.addAll(genderFiltered);
-        }
-        if (filterOptions.getBreed() != null) {
-            List<Dog> breedFiltered = dogRepository.findByBreed( filterOptions.getBreed().getPrimary() , filterOptions.getBreed().getSecondary(),
-                    filterOptions.getBreed().isMixed(), filterOptions.getBreed().isUnknown());
+//    public List<Dog> filterDogs(DogFilterOptions filterOptions) {
+//        HashSet<Dog> uniqueDogs = new HashSet<>();
+//        List<Dog> dogList = new ArrayList<>();
+//        if (filterOptions.getGender() != null) {
+//            List<Dog> genderFiltered = dogRepository.findByGender(filterOptions.getGender());
+//            dogList.addAll(genderFiltered);
+//        }
+//        if (filterOptions.getBreed() != null) {
+//            List<Dog> breedFiltered = dogRepository.findByBreed( filterOptions.getBreed().getPrimary() , filterOptions.getBreed().getSecondary(),
+//                    filterOptions.getBreed().isMixed(), filterOptions.getBreed().isUnknown());
+//
+//            dogList.addAll(breedFiltered);
+//        }
+//        return dogList;
+//
+//
+////        return dogRepository.filterDogs(filterOptions.getOrganizationName(), filterOptions.getGender(),
+////                filterOptions.getBreed().getPrimary() , filterOptions.getBreed().getSecondary(),
+////                filterOptions.getBreed().isMixed(), filterOptions.getBreed().isUnknown(),
+////                filterOptions.getContact().getAddress().getCity(), filterOptions.getContact().getAddress().getState(),
+////                filterOptions.getContact().getAddress().getPostcode(), filterOptions.getContact().getAddress().getCountry());
+//
+//    }
 
-            dogList.addAll(breedFiltered);
-        }
-        return dogList;
+    public List<Dog> filterDogs(DogFilterOptions dogFilterOptions) {
 
+        String organisationName = dogFilterOptions.getOrganizationName();
+        String primaryBreed = dogFilterOptions.getBreed().getPrimary();
+        String secondaryBreed = dogFilterOptions.getBreed().getSecondary();
+        boolean mixed = dogFilterOptions.getBreed().isMixed();
+        boolean notKnown = dogFilterOptions.getBreed().isUnknown();
+        Gender gender = dogFilterOptions.getGender();
+        String city = dogFilterOptions.getContact().getAddress().getCity();
+        String state = dogFilterOptions.getContact().getAddress().getState();
+        String postCode = dogFilterOptions.getContact().getAddress().getPostcode();
+        String country = dogFilterOptions.getContact().getAddress().getCountry();
 
-//        return dogRepository.filterDogs(filterOptions.getOrganizationName(), filterOptions.getGender(),
-//                filterOptions.getBreed().getPrimary() , filterOptions.getBreed().getSecondary(),
-//                filterOptions.getBreed().isMixed(), filterOptions.getBreed().isUnknown(),
-//                filterOptions.getContact().getAddress().getCity(), filterOptions.getContact().getAddress().getState(),
-//                filterOptions.getContact().getAddress().getPostcode(), filterOptions.getContact().getAddress().getCountry());
+        return dogRepository.filterDogs(organisationName, gender.name(), primaryBreed, secondaryBreed,
+                mixed, notKnown, city, state, postCode, country);
 
     }
 
