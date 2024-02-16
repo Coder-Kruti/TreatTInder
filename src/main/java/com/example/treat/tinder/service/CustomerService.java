@@ -1,18 +1,30 @@
 package com.example.treat.tinder.service;
 
+import com.example.treat.tinder.datasource.CustomerInteractionRepository;
 import com.example.treat.tinder.datasource.CustomerRepository;
+import com.example.treat.tinder.datasource.DogRepository;
 import com.example.treat.tinder.entity.Customer;
+import com.example.treat.tinder.entity.CustomerInteraction;
 import com.example.treat.tinder.entity.CustomerRequest;
+import com.example.treat.tinder.entity.Dog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class CustomerService {
     @Autowired
     private final CustomerRepository customerRepository;
+    @Autowired
+    private final CustomerInteractionRepository customerInteractionRepository;
 
-    CustomerService(CustomerRepository customerRepository){
+    @Autowired
+    private final DogRepository dogRepository;
+    CustomerService(CustomerRepository customerRepository, CustomerInteractionRepository customerInteractionRepository, DogRepository dogRepository){
         this.customerRepository = customerRepository;
+        this.customerInteractionRepository = customerInteractionRepository;
+        this.dogRepository = dogRepository;
     }
 
     public Customer saveCustomer (CustomerRequest customerRequest){
@@ -21,6 +33,21 @@ public class CustomerService {
             customer.setPhoneNumber(customerRequest.getPhoneNumber());
 
             return customerRepository.save(customer);
+    }
+
+    public boolean saveLikeDislike(CustomerInteraction customerInteraction) {
+        if (customerInteraction == null) {
+            return false;
+        }
+        //verify te particular Dog id and customer is already present or not
+        Optional<Dog> dog = dogRepository.findById(customerInteraction.getDogID());
+        Optional<Customer> customer = customerRepository.findById(customerInteraction.getCustomerID());
+        if (dog.isEmpty() || customer.isEmpty()) {
+            return false;
+        }
+
+        customerInteractionRepository.save(customerInteraction);
+        return true;
     }
 
 }

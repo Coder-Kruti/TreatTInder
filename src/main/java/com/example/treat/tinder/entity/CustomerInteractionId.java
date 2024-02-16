@@ -12,6 +12,6 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class CustomerInteractionId implements Serializable {
-    private int customer;
-    private int dog;
+    public int customerID;
+    public int dogID;
 }

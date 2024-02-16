@@ -8,26 +8,26 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @IdClass(CustomerInteractionId.class)
+
 public class CustomerInteraction {
     @Id
-    @ManyToOne
     @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private int customerID;
 
     @Id
-    @ManyToOne
     @JoinColumn(name = "dog_id")
-    private Dog dog;
+    private int dogID;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "interaction_type")
