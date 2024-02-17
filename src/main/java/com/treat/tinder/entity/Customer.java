@@ -19,7 +19,7 @@ import lombok.Setter;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userId;
+    private int customerID;
     private String name;
     @Column(name = "phone_number")
     private String phoneNumber;
