@@ -64,7 +64,7 @@ public class DogService {
 
     public List<Dog> filterDogs(DogFilterOptions dogFilterOptions) {
 
-        String organisationName = dogFilterOptions.getOrganizationName();
+        String organisationName = dogFilterOptions.getOrganizationID();
         String primaryBreed = dogFilterOptions.getBreed().getPrimary();
         String secondaryBreed = dogFilterOptions.getBreed().getSecondary();
         boolean mixed = dogFilterOptions.getBreed().isMixed();
