@@ -48,8 +48,15 @@ CREATE TABLE Customer (
 CREATE TABLE Customer_Interaction (
     customer_id INT,
     dog_id INT,
-    interaction_type ENUM('Liked', 'Disliked'),
+    interaction_type ENUM('Like', 'Dislike'),
     FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
     FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),
     PRIMARY KEY (customer_id, dog_id)
+);
+
+-- Last Processed
+CREATE TABLE LastProcessed (
+    id INT PRIMARY KEY,
+    last_processed_date DATE NOT NULL,
+    int page NOT NULL
 );

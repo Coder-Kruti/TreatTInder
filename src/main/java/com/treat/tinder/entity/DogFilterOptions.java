@@ -13,5 +13,5 @@ public class DogFilterOptions {
     private String organizationName;
     private Gender gender;
     private Breed breed;
-    private Contact contact;
+    private Address address;
 }

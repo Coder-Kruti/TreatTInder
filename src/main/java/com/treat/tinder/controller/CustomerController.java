@@ -23,7 +23,8 @@ public class CustomerController implements CustomerResource {
 
     @Override
     public ResponseEntity<Customer> createCustomer(@RequestBody CustomerRequest customerRequest) {
-       if(customerRequest == null || customerRequest.getName() == null || customerRequest.getPhoneNumber() == null || customerRequest.getName().isEmpty() || customerRequest.getPhoneNumber().isEmpty()){
+       if(customerRequest == null || customerRequest.getName() == null || customerRequest.getPhoneNumber() == null ||
+               customerRequest.getName().isEmpty() || customerRequest.getPhoneNumber().isEmpty()) {
            //invalid request
            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
        }

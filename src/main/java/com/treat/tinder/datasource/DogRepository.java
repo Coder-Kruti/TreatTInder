@@ -3,9 +3,11 @@ package com.treat.tinder.datasource;
 import com.treat.tinder.entity.Dog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface DogRepository extends JpaRepository<Dog, Integer> {
 
     @Query(value = "SELECT d.id, d.dogId,d.name,d.url, d.age, d.gender, d.size, d.orgID FROM Dog d " +
