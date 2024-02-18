@@ -38,46 +38,28 @@ public class DogService {
         this.lastProcessedRepository = lastProcessedRepository;
     }
 
-//    public List<Dog> filterDogs(DogFilterOptions filterOptions) {
-//        HashSet<Dog> uniqueDogs = new HashSet<>();
-//        List<Dog> dogList = new ArrayList<>();
-//        if (filterOptions.getGender() != null) {
-//            List<Dog> genderFiltered = dogRepository.findByGender(filterOptions.getGender());
-//            dogList.addAll(genderFiltered);
-//        }
-//        if (filterOptions.getBreed() != null) {
-//            List<Dog> breedFiltered = dogRepository.findByBreed( filterOptions.getBreed().getPrimary() , filterOptions.getBreed().getSecondary(),
-//                    filterOptions.getBreed().isMixed(), filterOptions.getBreed().isUnknown());
-//
-//            dogList.addAll(breedFiltered);
-//        }
-//        return dogList;
-//
-//
-////        return dogRepository.filterDogs(filterOptions.getOrganizationName(), filterOptions.getGender(),
-////                filterOptions.getBreed().getPrimary() , filterOptions.getBreed().getSecondary(),
-////                filterOptions.getBreed().isMixed(), filterOptions.getBreed().isUnknown(),
-////                filterOptions.getContact().getAddress().getCity(), filterOptions.getContact().getAddress().getState(),
-////                filterOptions.getContact().getAddress().getPostcode(), filterOptions.getContact().getAddress().getCountry());
-//
-//    }
 
     public List<Dog> filterDogs(DogFilterOptions dogFilterOptions) {
 
-        String organisationName = dogFilterOptions.getOrganizationID();
-        String primaryBreed = dogFilterOptions.getBreed().getPrimary();
-        String secondaryBreed = dogFilterOptions.getBreed().getSecondary();
+        String organisationName = isEmpty(dogFilterOptions.getOrganizationID()) ? null : dogFilterOptions.getOrganizationID();
+        String primaryBreed = isEmpty(dogFilterOptions.getBreed().getPrimary()) ? null : dogFilterOptions.getBreed().getPrimary();
+        String secondaryBreed = isEmpty(dogFilterOptions.getBreed().getSecondary()) ? null : dogFilterOptions.getBreed().getSecondary();
         boolean mixed = dogFilterOptions.getBreed().isMixed();
         boolean notKnown = dogFilterOptions.getBreed().isUnknown();
         Gender gender = dogFilterOptions.getGender();
-        String city = dogFilterOptions.getAddress().getCity();
-        String state = dogFilterOptions.getAddress().getState();
-        String postCode = dogFilterOptions.getAddress().getPostcode();
-        String country = dogFilterOptions.getAddress().getCountry();
+        String city = isEmpty(dogFilterOptions.getAddress().getCity()) ? null : dogFilterOptions.getAddress().getCity();
+        String state = isEmpty(dogFilterOptions.getAddress().getState()) ? null : dogFilterOptions.getAddress().getState();
+        String postCode = isEmpty(dogFilterOptions.getAddress().getPostcode()) ? null : dogFilterOptions.getAddress().getPostcode();
+        String country = isEmpty(dogFilterOptions.getAddress().getCountry()) ? null : dogFilterOptions.getAddress().getCountry();
 
         return dogRepository.filterDogs(organisationName, gender.name(), primaryBreed, secondaryBreed,
                 mixed, notKnown, city, state, postCode, country);
 
+    }
+
+    // Helper method to check if a string is empty
+    private boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
     }
 
     public void getDogsPetFinder() {
