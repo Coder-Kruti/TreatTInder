@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DogFilterOptions {
-    private String organizationName;
+    private String organizationID;
     private Gender gender;
     private Breed breed;
     private Address address;
