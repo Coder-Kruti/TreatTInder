@@ -2,6 +2,7 @@ package com.treat.tinder.resource;
 
 import com.treat.tinder.entity.Customer;
 import com.treat.tinder.entity.CustomerAction;
+import com.treat.tinder.entity.CustomerLikeDislikeResponse;
 import com.treat.tinder.entity.CustomerRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,6 +40,6 @@ public interface CustomerResource {
             @ApiResponse(responseCode = "400", description = "Bad Request.",content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error.",content = @Content)
     })
-    public ResponseEntity<String> saveLikeDislike(@PathVariable Integer customerId, @PathVariable Integer dogId, @RequestBody CustomerAction customerAction);
+    public ResponseEntity<CustomerLikeDislikeResponse> saveLikeDislike(@PathVariable Integer customerId, @PathVariable Integer dogId, @RequestBody CustomerAction customerAction);
 
 }

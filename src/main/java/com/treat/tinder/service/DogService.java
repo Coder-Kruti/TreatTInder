@@ -12,6 +12,8 @@ import com.treat.tinder.entity.Gender;
 import com.treat.tinder.entity.LastProcessed;
 import com.treat.tinder.entity.Organisation;
 import com.treat.tinder.entity.PetFinderResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ public class DogService {
     @Autowired
     private final LastProcessedRepository lastProcessedRepository;
 
+    private final Logger logger = LoggerFactory.getLogger(DogService.class);
 
     DogService(DogRepository dogRepository, BreedRepository breedRepository, OrganisationRepository organisationRepository, LastProcessedRepository lastProcessedRepository) {
         this.dogRepository = dogRepository;
@@ -38,9 +41,15 @@ public class DogService {
         this.lastProcessedRepository = lastProcessedRepository;
     }
 
+    /***
+     * Filter the dog from the database as per given criteria.
+     * @param dogFilterOptions Takes the filter options which includes organisation , breed and address.
+     * @return List pf dogs which satisfy the given filter
+     */
 
     public List<Dog> filterDogs(DogFilterOptions dogFilterOptions) {
-
+        logger.info("Accepted request to filter dogs");
+        //1. Verify if any of the filter parameters are empty , if empty make it as null or take the actual value.
         String organisationName = isEmpty(dogFilterOptions.getOrganizationID()) ? null : dogFilterOptions.getOrganizationID();
         String primaryBreed = isEmpty(dogFilterOptions.getBreed().getPrimary()) ? null : dogFilterOptions.getBreed().getPrimary();
         String secondaryBreed = isEmpty(dogFilterOptions.getBreed().getSecondary()) ? null : dogFilterOptions.getBreed().getSecondary();
@@ -51,21 +60,32 @@ public class DogService {
         String state = isEmpty(dogFilterOptions.getAddress().getState()) ? null : dogFilterOptions.getAddress().getState();
         String postCode = isEmpty(dogFilterOptions.getAddress().getPostcode()) ? null : dogFilterOptions.getAddress().getPostcode();
         String country = isEmpty(dogFilterOptions.getAddress().getCountry()) ? null : dogFilterOptions.getAddress().getCountry();
+        logger.info("The filters are validated and will be querying database.");
 
+        //2. Call the JPA to execute the query and list of dogs as per the filter.
         return dogRepository.filterDogs(organisationName, gender.name(), primaryBreed, secondaryBreed,
                 mixed, notKnown, city, state, postCode, country);
 
     }
 
-    // Helper method to check if a string is empty
+    /**
+     * Helper method to check if a string is empty
+     * @param str String to be checked if empty
+     * @return true if String empty else false
+     */
     private boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
 
+    /**
+     * Fetch the details from PetFinder API.
+     */
     public void getDogsPetFinder() {
+        logger.info("Fetching the Dogs from Pet finder");
+        //1. Get the today's date .
         PetFinder petFinder = new PetFinder();
         LocalDate today = LocalDate.now();
-
+        //2. Check if already  data is processed for today's date, if processed then increment the page number and update the db so that it fetches new set of records
         Optional<LastProcessed> optionalPage = lastProcessedRepository.findById(1); // The ID of the row will be one as we are updating the same record
         if (optionalPage.isPresent()) {
             LastProcessed existingPage = optionalPage.get();
@@ -83,10 +103,11 @@ public class DogService {
             newPage.setPageNumber(1);
             lastProcessedRepository.save(newPage);
         }
-
+        logger.info("Updated the last processed page ");
+        //3. Call the pet finder service
         PetFinderResponse petFinderResponse = petFinder.getDogsPetFinder(lastProcessedRepository.findById(1).get().getPageNumber());
-
-        // store the response into db .
+        logger.info("Successfully fetched the response from PetFinder.");
+        //4. Process the response and store in the database. Here we will first store the organisation , dog and its breed if they are already not present.
         for (Animal animal : petFinderResponse.getAnimals()) {
             Organisation existingOrg = organisationRepository.findByOrgID(animal.getOrganization_id());
 
@@ -100,8 +121,14 @@ public class DogService {
                 saveDogBreed(animal, newDog);
             }
         }
+        logger.info("Successfully stored all the data into database.");
     }
 
+    /**
+     * Helper method to store the breed data into data base
+     * @param animal incoming response to be stored
+     * @param newDog to get the dog id.
+     */
     private void saveDogBreed(Animal animal, Dog newDog) {
         Breed breed = new Breed();
         breed.setPrimary(animal.getBreeds().getPrimary());
@@ -112,6 +139,11 @@ public class DogService {
         breedRepository.save(breed);
     }
 
+    /**
+     * Helper method to save the Dog data into database
+     * @param animal Incoming response
+     * @return saved data into db.
+     */
     private Dog saveDog(Animal animal) {
         Dog dog = new Dog();
         dog.setName(animal.getName());
@@ -126,7 +158,11 @@ public class DogService {
         return dog;
     }
 
-    public void saveOrganisation(Animal animal) {
+    /**
+     * Helper method to save the Organisation data into database
+     * @param animal Incoming response
+     */
+    private void saveOrganisation(Animal animal) {
         Organisation organisation = new Organisation();
         organisation.setOrgID(animal.getOrganization_id());
         organisation.setName(animal.getOrganization_id());

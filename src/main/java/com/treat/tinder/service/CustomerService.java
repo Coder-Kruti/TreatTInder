@@ -5,8 +5,11 @@ import com.treat.tinder.datasource.CustomerRepository;
 import com.treat.tinder.datasource.DogRepository;
 import com.treat.tinder.entity.Customer;
 import com.treat.tinder.entity.CustomerInteraction;
+import com.treat.tinder.entity.CustomerLikeDislikeResponse;
 import com.treat.tinder.entity.CustomerRequest;
 import com.treat.tinder.entity.Dog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,8 @@ public class CustomerService {
     @Autowired
     private final CustomerInteractionRepository customerInteractionRepository;
 
+    private final Logger logger = LoggerFactory.getLogger(CustomerService.class);
+
     @Autowired
     private final DogRepository dogRepository;
     CustomerService(CustomerRepository customerRepository, CustomerInteractionRepository customerInteractionRepository, DogRepository dogRepository){
@@ -27,6 +32,11 @@ public class CustomerService {
         this.dogRepository = dogRepository;
     }
 
+    /**
+     * Save the customer data
+     * @param customerRequest Name and phone number of the customer
+     * @return Customer that is created.
+     */
     public Customer saveCustomer (CustomerRequest customerRequest){
             Customer customer = new Customer();
             customer.setName(customerRequest.getName());
@@ -35,19 +45,27 @@ public class CustomerService {
             return customerRepository.save(customer);
     }
 
-    public boolean saveLikeDislike(CustomerInteraction customerInteraction) {
+    /**
+     *  Save the like/ dislike of a dog
+     * @param customerInteraction Like/Dislike
+     * @return Weather its successful
+     */
+    public CustomerLikeDislikeResponse saveLikeDislike(CustomerInteraction customerInteraction) {
+        logger.info("Save Like/Dislike of a dog.");
+
         if (customerInteraction == null) {
-            return false;
+            return new CustomerLikeDislikeResponse(false, "The input given is null.");
         }
-        //verify te particular Dog id and customer is already present or not
+
+        // Verify if the particular Dog id and customer are already present
         Optional<Dog> dog = dogRepository.findById(customerInteraction.getDogID());
         Optional<Customer> customer = customerRepository.findById(customerInteraction.getCustomerID());
         if (dog.isEmpty() || customer.isEmpty()) {
-            return false;
+            return new CustomerLikeDislikeResponse(false, "The dog or customer is not present in the database.");
         }
 
         customerInteractionRepository.save(customerInteraction);
-        return true;
-    }
 
+        return new CustomerLikeDislikeResponse(true, "Successfully saved the customer interaction.");
+    }
 }
