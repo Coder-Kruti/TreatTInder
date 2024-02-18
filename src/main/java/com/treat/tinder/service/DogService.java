@@ -1,21 +1,23 @@
 package com.treat.tinder.service;
 
 import com.treat.tinder.datasource.BreedRepository;
-import com.treat.tinder.datasource.CustomerInteractionRepository;
-import com.treat.tinder.datasource.CustomerRepository;
 import com.treat.tinder.datasource.DogRepository;
+import com.treat.tinder.datasource.LastProcessedRepository;
 import com.treat.tinder.datasource.OrganisationRepository;
 import com.treat.tinder.entity.Animal;
 import com.treat.tinder.entity.Breed;
 import com.treat.tinder.entity.Dog;
 import com.treat.tinder.entity.DogFilterOptions;
 import com.treat.tinder.entity.Gender;
+import com.treat.tinder.entity.LastProcessed;
 import com.treat.tinder.entity.Organisation;
 import com.treat.tinder.entity.PetFinderResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DogService {
@@ -24,19 +26,16 @@ public class DogService {
     @Autowired
     private final BreedRepository breedRepository;
     @Autowired
-    private final CustomerInteractionRepository customerInteractionRepository;
-    @Autowired
     private final OrganisationRepository organisationRepository;
     @Autowired
-    private final CustomerRepository customerRepository;
+    private final LastProcessedRepository lastProcessedRepository;
 
 
-    DogService(DogRepository dogRepository, BreedRepository breedRepository, CustomerInteractionRepository customerInteractionRepository, OrganisationRepository organisationRepository, CustomerRepository customerRepository) {
+    DogService(DogRepository dogRepository, BreedRepository breedRepository, OrganisationRepository organisationRepository, LastProcessedRepository lastProcessedRepository) {
         this.dogRepository = dogRepository;
         this.breedRepository = breedRepository;
-        this.customerInteractionRepository = customerInteractionRepository;
         this.organisationRepository = organisationRepository;
-        this.customerRepository = customerRepository;
+        this.lastProcessedRepository = lastProcessedRepository;
     }
 
 //    public List<Dog> filterDogs(DogFilterOptions filterOptions) {
@@ -71,10 +70,10 @@ public class DogService {
         boolean mixed = dogFilterOptions.getBreed().isMixed();
         boolean notKnown = dogFilterOptions.getBreed().isUnknown();
         Gender gender = dogFilterOptions.getGender();
-        String city = dogFilterOptions.getContact().getAddress().getCity();
-        String state = dogFilterOptions.getContact().getAddress().getState();
-        String postCode = dogFilterOptions.getContact().getAddress().getPostcode();
-        String country = dogFilterOptions.getContact().getAddress().getCountry();
+        String city = dogFilterOptions.getAddress().getCity();
+        String state = dogFilterOptions.getAddress().getState();
+        String postCode = dogFilterOptions.getAddress().getPostcode();
+        String country = dogFilterOptions.getAddress().getCountry();
 
         return dogRepository.filterDogs(organisationName, gender.name(), primaryBreed, secondaryBreed,
                 mixed, notKnown, city, state, postCode, country);
@@ -83,7 +82,27 @@ public class DogService {
 
     public void getDogsPetFinder() {
         PetFinder petFinder = new PetFinder();
-        PetFinderResponse petFinderResponse = petFinder.getDogsPetFinder();
+        LocalDate today = LocalDate.now();
+
+        Optional<LastProcessed> optionalPage = lastProcessedRepository.findById(1); // The ID of the row will be one as we are updating the same record
+        if (optionalPage.isPresent()) {
+            LastProcessed existingPage = optionalPage.get();
+            if (!existingPage.getLastProcessedDate().equals(today)) {
+                existingPage.setLastProcessedDate(today);
+                existingPage.setPageNumber(1);
+            } else {
+                existingPage.setPageNumber(existingPage.getPageNumber() + 1);
+            }
+            lastProcessedRepository.save(existingPage);
+        } else {
+            LastProcessed newPage = new LastProcessed();
+            newPage.setId(1);
+            newPage.setLastProcessedDate(today);
+            newPage.setPageNumber(1);
+            lastProcessedRepository.save(newPage);
+        }
+
+        PetFinderResponse petFinderResponse = petFinder.getDogsPetFinder(lastProcessedRepository.findById(1).get().getPageNumber());
 
         // store the response into db .
         for (Animal animal : petFinderResponse.getAnimals()) {
@@ -98,9 +117,7 @@ public class DogService {
                 Dog newDog = saveDog(animal);
                 saveDogBreed(animal, newDog);
             }
-
         }
-
     }
 
     private void saveDogBreed(Animal animal, Dog newDog) {

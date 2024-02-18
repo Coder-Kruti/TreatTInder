@@ -14,7 +14,7 @@ public interface DogResource {
 
     @RequestMapping(value = "/treat/tinder",
             produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.GET)
+            method = RequestMethod.POST)
     ResponseEntity<List<Dog>> getDogs(@RequestBody DogFilterOptions filterOptions);
 
     @RequestMapping(value = "/treat/petfinder",

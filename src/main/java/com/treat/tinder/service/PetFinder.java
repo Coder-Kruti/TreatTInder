@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class PetFinder {
     private final Logger logger = LoggerFactory.getLogger(PetFinder.class);
-    private static final String GET_DOGS = Constants.PET_FINDER_BASE_URL + "v2/animals?type=dog&page=3";
+    private static final String GET_DOGS = Constants.PET_FINDER_BASE_URL + "v2/animals?type=dog&page=";
 
     private String getAuthToken() {
         StringBuilder response = new StringBuilder();
@@ -94,7 +94,7 @@ public class PetFinder {
     }
 
 
-    public PetFinderResponse getDogsPetFinder() {
+    public PetFinderResponse getDogsPetFinder(int pageNumber) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -102,7 +102,7 @@ public class PetFinder {
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<PetFinderResponse> responseEntity = restTemplate.exchange(GET_DOGS, HttpMethod.GET, entity, PetFinderResponse.class);
+        ResponseEntity<PetFinderResponse> responseEntity = restTemplate.exchange(GET_DOGS + pageNumber, HttpMethod.GET, entity, PetFinderResponse.class);
 
         if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
             PetFinderResponse petFinderResponse = responseEntity.getBody();

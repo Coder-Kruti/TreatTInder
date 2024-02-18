@@ -9,9 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DogFilterOptions {
-    private String organizationName;
-    private Gender gender;
-    private Breed breed;
-    private Address address;
+public class CustomerAction {
+    private InteractionType interactionType;
 }
